@@ -21,11 +21,13 @@ namespace ExpressionSandbox
             return Visit(expression);
         }
 
-        protected override Expression VisitBinary(BinaryExpression node)
+        public override Expression Visit(Expression node)
         {
-            return !IsOriginal(node)
-                ? base.VisitBinary(node)
-                : Replacement;
+            return node == null
+                ? null
+                : !IsOriginal(node)
+                    ? base.Visit(node)
+                    : Replacement;
         }
     }
 }
