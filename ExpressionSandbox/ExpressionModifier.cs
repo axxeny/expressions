@@ -5,13 +5,13 @@ namespace ExpressionSandbox
 {
     internal class ExpressionModifier : ExpressionVisitor
     {
-        public Func<Expression, bool> IsOriginal { get; private set; }
+        public Func<Expression, bool> IsNodeToReplace { get; private set; }
         public Expression Replacement { get; private set; }
         public bool Recursive { get; private set; }
 
-        public ExpressionModifier(Func<Expression, bool> isOriginal, Expression replacement, bool recursive)
+        public ExpressionModifier(Func<Expression, bool> isNodeToReplace, Expression replacement, bool recursive)
         {
-            IsOriginal = isOriginal;
+            IsNodeToReplace = isNodeToReplace;
             Replacement = replacement;
             Recursive = recursive;
         }
@@ -23,11 +23,11 @@ namespace ExpressionSandbox
 
         public override Expression Visit(Expression node)
         {
-            return node == null
-                ? null
-                : !IsOriginal(node)
-                    ? base.Visit(node)
-                    : Replacement;
+            if (node == null) return null;
+            if (!IsNodeToReplace(node)) return base.Visit(node);
+            return Recursive 
+                ? Visit(Replacement)
+                : base.Visit(node);
         }
     }
 }

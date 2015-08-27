@@ -45,6 +45,8 @@
     <Compile Include="ExpressionConsoleIo.cs" />
     <Compile Include="ExpressionHelper.cs" />
     <Compile Include="ExpressionModifier.cs" />
+    <Compile Include="ExpressionRestrictions.cs" />
+    <Compile Include="ExpressionUser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QuadraticEquationExpressionBuilder.cs" />

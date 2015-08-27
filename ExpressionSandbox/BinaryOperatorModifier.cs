@@ -4,13 +4,14 @@ namespace ExpressionSandbox
 {
     internal class BinaryOperatorModifier : ExpressionVisitor
     {
-        public ExpressionType OriginalOperator { get; private set; }
+        // Свойства и конструктор
+        public ExpressionType NodeToReplace { get; private set; }
         public ExpressionType Replacement { get; private set; }
         public bool Recursive { get; private set; }
 
-        public BinaryOperatorModifier(ExpressionType originalOperator, ExpressionType replacement, bool recursive)
+        public BinaryOperatorModifier(ExpressionType nodeToReplace, ExpressionType replacement, bool recursive)
         {
-            OriginalOperator = originalOperator;
+            NodeToReplace = nodeToReplace;
             Replacement = replacement;
             Recursive = recursive;
         }
@@ -20,24 +21,21 @@ namespace ExpressionSandbox
             return Visit(expression);
         }
 
-        private Expression VisitIfRecursive(Expression expression)
-        {
-            return Recursive
-                ? Visit(expression)
-                : expression;
-        }
-
         protected override Expression VisitBinary(BinaryExpression node)
         {
-            if (node.NodeType != OriginalOperator)
+            if (node.NodeType == NodeToReplace)
             {
-                return base.VisitBinary(node);
+                var left = Recursive
+                    ? Visit(node.Left)
+                    : node.Left;
+                var right = Recursive
+                    ? Visit(node.Right)
+                    : node.Right;
+
+                return Expression.MakeBinary(Replacement, left, right);
             }
 
-            var left = VisitIfRecursive(node.Left);
-            var right = VisitIfRecursive(node.Right);
-
-            return Expression.MakeBinary(Replacement, left, right);
+            return base.VisitBinary(node);
         }
     }
 }

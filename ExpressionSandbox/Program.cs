@@ -1,4 +1,6 @@
-﻿using System.Diagnostics.Contracts;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -10,7 +12,7 @@ namespace ExpressionSandbox
         {
             Contract.Assert(args.Length == 0);
 
-            var roots = QuadraticEquationExpressionBuilder.GetQuadraticEquationRoots();
+            var roots = QuadraticEquationExpressionBuilder.GetQuadraticEquationRootsAtRuntime();
 
             ExpressionConsoleIo.WriteExpressions(roots, "a", "b", "D");
 
@@ -21,11 +23,16 @@ namespace ExpressionSandbox
                     e => e.NodeType == ExpressionType.Parameter && ((ParameterExpression) e).Name == "D",
                     discrBody,
                     recursive: false);
-            
-            var rootsWithHiddenDiscr = roots
-                .Select(e => binaryToConst.Modify(e));
 
-            ExpressionConsoleIo.WriteExpressions(rootsWithHiddenDiscr, "a", "b", "c");
+            var rootsWithDiscr = roots
+                .Select(e => binaryToConst.Modify(e)).ToArray();
+            ExpressionConsoleIo.WriteExpressions(rootsWithDiscr, "a", "b", "c");
+
+            var calculationResults = ExpressionUser.CompileAndRun(rootsWithDiscr.Select(e => (Expression<Func<double, double, double, double>>)e), 1, 7, -3);
+            foreach (var result in calculationResults)
+            {
+                Console.WriteLine(result);
+            }
         }
     }
 }
